@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Solicitud SOAP</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    form {
+      margin-top: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 5px;
+      font-size: 14px;
+    }
+
+    input[type="submit"] {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #responseContainer {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Solicitud SOAP</h1>
+  <form id="soapForm" action="http://localhost:3000/soap-request" method="post">
+    <label for="ubiNum">ubiNum:</label>
+    <input type="text" id="ubiNum" name="ubiNum" value="500">
+    <br><br>
+    <input type="submit" value="Enviar">
+  </form>
+
+  <div id="responseContainer"></div>
+
+  <script>
+    document.getElementById("soapForm").addEventListener("submit", function(event) {
+      event.preventDefault(); // Evitar que el formulario se envíe de forma predeterminada
+      
+      // Obtener el valor de ubiNum del formulario
+      var ubiNumValue = document.getElementById("ubiNum").value;
+      
+      // Crear un objeto de solicitud XMLHttpRequest
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "http://localhost:3000/soap-request", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      
+      // Manejar la respuesta de la solicitud
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          var response = JSON.parse(xhr.responseText);
+          console.log(response); // Hacer algo con la respuesta recibida
+
+          // Mostrar la respuesta en el contenedor HTML
+          var responseContainer = document.getElementById("responseContainer");
+          var result = response["soap:Envelope"]["soap:Body"][0]["m:NumberToWordsResponse"][0]["m:NumberToWordsResult"][0];
+          responseContainer.innerHTML = "Respuesta: " + result;
+        } else {
+          console.error("Error en la solicitud SOAP. Código de estado: " + xhr.status);
+        }
+      };
+      
+      // Enviar la solicitud con el valor de ubiNum como JSON en el cuerpo
+      xhr.send(JSON.stringify({ ubiNum: ubiNumValue }));
+    });
+  </script>
+</body>
+</html>
